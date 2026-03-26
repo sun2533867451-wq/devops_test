@@ -25,10 +25,6 @@ MAC       : 00:0c:29:4d:73:b3
 假设网关为: 196.21.5.1
 Ping 196.21.5.1 ... reachable
 '''
-
-import os
-import re
-
 # 使用模拟数据（容器环境无真实网卡）
 '''
 ens160: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
@@ -41,14 +37,18 @@ ens160: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         TX errors 0  dropped 58 overruns 0  carrier 0  collisions 0
 
 '''
+import os
+import re
+
 result = os.popen("ifconfig ens160").read()
-print(result)
+#print(result)
 # broadcast 和 ether 之间有 inet6 一行，需用 .*? + re.DOTALL 跨行匹配
 regex = r'inet\s+(\d+\.\d+\.\d+\.\d+)\s+netmask\s+(\d+\.\d+\.\d+\.\d+)\s+broadcast\s+(\d+\.\d+\.\d+\.\d+).*?ether\s+([0-9a-fA-F:]{17})'
 
 match = re.search(regex, result, re.DOTALL)
 if match:
     ip, netmask, broadcast, mac = match.groups()
+    
     print("{:<10}: {}".format("IP", ip))
     print("{:<10}: {}".format("Netmask", netmask))
     print("{:<10}: {}".format("Broadcast", broadcast))
